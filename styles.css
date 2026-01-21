@@ -972,3 +972,156 @@ select option {
         font-size: 1.1rem;
     }
 }
+
+/* Custom Streams Section */
+.custom-stream-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.custom-input {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #e4e4e7;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+.custom-input::placeholder {
+    color: #71717a;
+}
+
+.btn-custom-add {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-custom-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.6);
+}
+
+.btn-custom-add:active {
+    transform: translateY(0);
+}
+
+.custom-streams-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.custom-stream-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.custom-stream-item:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.custom-stream-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.custom-stream-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e4e4e7;
+    margin-bottom: 4px;
+}
+
+.custom-stream-url {
+    font-size: 0.75rem;
+    color: #71717a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-delete-stream {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.btn-delete-stream:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #fff;
+}
+
+.custom-stream-message {
+    padding: 12px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.custom-stream-message p {
+    font-size: 0.85rem;
+    color: #a1a1aa;
+    margin: 0;
+}
+
+.custom-stream-message a {
+    color: #818cf8;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.custom-stream-message a:hover {
+    color: #c7d2fe;
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .custom-stream-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .btn-delete-stream {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .custom-stream-message p {
+        font-size: 0.8rem;
+    }
+}

@@ -20,7 +20,20 @@ class RadioPlayer {
         this.muteBtn = document.getElementById('mute-btn');
         this.visualizerBars = document.querySelectorAll('.visualizer-bar');
         this.visualizerStatus = document.getElementById('visualizer-status');
-        
+
+        // Custom streams
+        this.customStreamName = document.getElementById('custom-stream-name');
+        this.customStreamUrl = document.getElementById('custom-stream-url');
+        this.addCustomStreamBtn = document.getElementById('add-custom-stream-btn');
+        this.customStreamsList = document.getElementById('custom-streams-list');
+        this.customStreams = [];
+
+        // Official streams (hardcoded from HTML)
+        this.officialStreams = [
+            { name: 'Sucesos', url: 'https://server1.dainusradio.com:2341/stream' },
+            { name: 'Cadena 3', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/radio3.mp3' }
+        ];
+
         // Audio state
         this.audio = null;
         this.currentDelay = 0; // Iniciar en 0, se incrementará durante buffering
@@ -70,11 +83,14 @@ class RadioPlayer {
     }
     
     init() {
+        this.loadCustomStreams();
         this.bindEvents();
         this.initEqualizer();
         this.updateDelayDisplay();
         this.hideVisualizer(); // Ocultar visualizador inicialmente
         this.updateMuteButton(); // Asegurar que el botón de mute refleje el estado inicial
+        this.updateStreamSelector();
+        this.renderCustomStreamsList();
     }
 
     hideVisualizer() {
@@ -183,6 +199,29 @@ class RadioPlayer {
         if (eqResetBtn) {
             eqResetBtn.addEventListener('click', () => {
                 this.resetEqualizer();
+            });
+        }
+
+        // Custom stream add button
+        if (this.addCustomStreamBtn) {
+            this.addCustomStreamBtn.addEventListener('click', () => {
+                this.addCustomStream();
+            });
+        }
+
+        // Allow Enter key to add custom stream
+        if (this.customStreamUrl) {
+            this.customStreamUrl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.addCustomStream();
+                }
+            });
+        }
+        if (this.customStreamName) {
+            this.customStreamName.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.addCustomStream();
+                }
             });
         }
     }
@@ -1031,6 +1070,153 @@ class RadioPlayer {
             // Sin preset guardado, resetear a 0
             this.resetEqualizer();
         }
+    }
+
+    // ==================== CUSTOM STREAMS ====================
+
+    loadCustomStreams() {
+        try {
+            const stored = localStorage.getItem('customRadioStreams');
+            this.customStreams = stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error loading custom streams:', error);
+            this.customStreams = [];
+        }
+    }
+
+    saveCustomStreams() {
+        try {
+            localStorage.setItem('customRadioStreams', JSON.stringify(this.customStreams));
+        } catch (error) {
+            console.error('Error saving custom streams:', error);
+        }
+    }
+
+    addCustomStream() {
+        const name = this.customStreamName.value.trim();
+        const url = this.customStreamUrl.value.trim();
+
+        if (!name || !url) {
+            alert('Por favor, ingresa un nombre y una URL para el stream.');
+            return;
+        }
+
+        // Basic URL validation
+        try {
+            new URL(url);
+        } catch (error) {
+            alert('La URL ingresada no es válida. Por favor, verifica e intenta nuevamente.');
+            return;
+        }
+
+        // Check if URL already exists
+        const exists = this.customStreams.some(stream => stream.url === url) ||
+                      this.officialStreams.some(stream => stream.url === url);
+
+        if (exists) {
+            alert('Este stream ya existe en tu lista.');
+            return;
+        }
+
+        // Add to custom streams
+        this.customStreams.push({ name, url });
+        this.saveCustomStreams();
+        this.updateStreamSelector();
+        this.renderCustomStreamsList();
+
+        // Clear input fields
+        this.customStreamName.value = '';
+        this.customStreamUrl.value = '';
+
+        // Focus on name input for next entry
+        this.customStreamName.focus();
+    }
+
+    deleteCustomStream(index) {
+        const stream = this.customStreams[index];
+
+        if (!confirm(`¿Estás seguro de que quieres eliminar "${stream.name}"?`)) {
+            return;
+        }
+
+        // If the deleted stream is currently selected, clear the selection
+        if (this.currentStreamUrl === stream.url) {
+            this.stop();
+            this.streamSelector.value = '';
+            this.currentStreamUrl = '';
+        }
+
+        this.customStreams.splice(index, 1);
+        this.saveCustomStreams();
+        this.updateStreamSelector();
+        this.renderCustomStreamsList();
+    }
+
+    updateStreamSelector() {
+        // Clear all options except the first one (placeholder)
+        while (this.streamSelector.options.length > 1) {
+            this.streamSelector.remove(1);
+        }
+
+        // Add official streams
+        this.officialStreams.forEach(stream => {
+            const option = document.createElement('option');
+            option.value = stream.url;
+            option.textContent = stream.name;
+            this.streamSelector.appendChild(option);
+        });
+
+        // Add custom streams with a visual indicator
+        this.customStreams.forEach(stream => {
+            const option = document.createElement('option');
+            option.value = stream.url;
+            option.textContent = `🎧 ${stream.name}`;
+            this.streamSelector.appendChild(option);
+        });
+    }
+
+    renderCustomStreamsList() {
+        if (!this.customStreamsList) return;
+
+        // Clear existing items
+        this.customStreamsList.innerHTML = '';
+
+        if (this.customStreams.length === 0) {
+            this.customStreamsList.innerHTML = '<p style="color: #71717a; font-size: 0.85rem; text-align: center; padding: 12px;">No hay streams personalizados aún.</p>';
+            return;
+        }
+
+        // Render each custom stream
+        this.customStreams.forEach((stream, index) => {
+            const item = document.createElement('div');
+            item.className = 'custom-stream-item';
+
+            const info = document.createElement('div');
+            info.className = 'custom-stream-info';
+
+            const name = document.createElement('div');
+            name.className = 'custom-stream-name';
+            name.textContent = stream.name;
+
+            const url = document.createElement('div');
+            url.className = 'custom-stream-url';
+            url.textContent = stream.url;
+            url.title = stream.url;
+
+            info.appendChild(name);
+            info.appendChild(url);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-delete-stream';
+            deleteBtn.textContent = 'Eliminar';
+            deleteBtn.addEventListener('click', () => {
+                this.deleteCustomStream(index);
+            });
+
+            item.appendChild(info);
+            item.appendChild(deleteBtn);
+            this.customStreamsList.appendChild(item);
+        });
     }
 }
 
