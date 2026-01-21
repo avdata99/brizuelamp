@@ -31,7 +31,8 @@ class RadioPlayer {
         // Official streams (hardcoded from HTML)
         this.officialStreams = [
             { name: 'Sucesos', url: 'https://server1.dainusradio.com:2341/stream' },
-            { name: 'Cadena 3', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/radio3.mp3' }
+            { name: 'Cadena 3', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/radio3.mp3' },
+            // { name: 'Suquia', url: 'https://streaming01.shockmedia.com.ar:10945/;' },
         ];
 
         // Audio state
