@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRIZUELAMP</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+
+        <div class="card">
+            <div class="player-controls">
+                <select id="stream-selector">
+                    <option value="">-- Elegir radio --</option>
+                    <option value="http://server1.dainusradio.com:2341/stream">Sucesos</option>
+                    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/radio3.mp3">Cadena 3</option>
+                </select>
+                <button id="play-btn" class="btn-icon btn-icon-play" disabled title="Reproducir">
+                    ▶
+                </button>
+                <button id="pause-btn" class="btn-icon btn-icon-pause" disabled title="Pausar">
+                    ⏸
+                </button>
+                <button id="stop-btn" class="btn-icon btn-icon-stop" disabled title="Detener">
+                    ⏹
+                </button>
+            </div>
+
+            <div class="visualizer-container">
+                <div id="audio-visualizer" class="audio-visualizer">
+                    <div class="visualizer-bar" data-bar="0"></div>
+                    <div class="visualizer-bar" data-bar="1"></div>
+                    <div class="visualizer-bar" data-bar="2"></div>
+                    <div class="visualizer-bar" data-bar="3"></div>
+                </div>
+                <div id="visualizer-status" class="visualizer-status">Selecciona un stream</div>
+            </div>
+
+            <div class="volume-control">
+                <button id="mute-btn" class="volume-icon-btn" title="Silenciar/Activar sonido">🔊</button>
+                <label for="volume-slider" class="volume-label">Volumen:</label>
+                <input type="range" id="volume-slider" min="0" max="100" value="100">
+                <span id="volume-value">100%</span>
+            </div>
+        </div>
+        
+        <div class="card">
+
+            <div class="delay-display">
+                <span class="delay-label">Delay actual:</span>
+                <span id="delay-value" class="delay-value">0 ms</span>
+            </div>
+
+            <div class="delay-slider-container">
+                <div class="slider-labels">
+                    <span class="slider-label">← 3min atrás</span>
+                    <span class="slider-label-center">1.5min</span>
+                    <span class="slider-label">VIVO →</span>
+                </div>
+                <input type="range" id="delay-slider" class="delay-slider"
+                       min="0" max="180000" step="500" value="170000" disabled>
+                <div class="slider-hint">Desliza para ajustar</div>
+            </div>
+
+            <div class="quick-actions">
+                <div class="action-section">
+                    <div class="action-buttons">
+                        <button class="btn-round btn-round-large" data-delay="5000" title="5 segundos atrás">
+                            <span class="round-icon">«</span>
+                            <span class="round-label">5s</span>
+                        </button>
+                        <button class="btn-round btn-round-medium" data-delay="1000" title="1 segundo atrás">
+                            <span class="round-icon">‹</span>
+                            <span class="round-label">1s</span>
+                        </button>
+                        <button class="btn-round btn-round-small" data-delay="100" title="0.1 segundos atrás">
+                            <span class="round-icon">‹</span>
+                            <span class="round-label">0.1s</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="go-live-btn" class="btn-round btn-round-live" title="Ir al vivo">
+                    <span class="round-icon live-dot">●</span>
+                    <span class="round-label">VIVO</span>
+                </button>
+
+                <div class="action-section">
+                    <div class="action-buttons">
+                        <button class="btn-round btn-round-small" data-delay="-100" title="0.1 segundos adelante">
+                            <span class="round-icon">›</span>
+                            <span class="round-label">0.1s</span>
+                        </button>
+                        <button class="btn-round btn-round-medium" data-delay="-1000" title="1 segundo adelante">
+                            <span class="round-icon">›</span>
+                            <span class="round-label">1s</span>
+                        </button>
+                        <button class="btn-round btn-round-large" data-delay="-5000" title="5 segundos adelante">
+                            <span class="round-icon">»</span>
+                            <span class="round-label">5s</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="eq-header">
+                <h2>🎚 Ecualizador</h2>
+                <div class="eq-controls">
+                    <button id="eq-toggle-btn" class="btn-eq-toggle">Ocultar EQ</button>
+                    <button id="eq-reset-btn" class="btn-eq-reset">Reset</button>
+                </div>
+            </div>
+
+            <div id="eq-panel" class="eq-panel">
+                <div class="eq-sliders">
+                    <div class="eq-band">
+                        <input type="range" class="eq-slider" data-eq-band="0" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-label">60Hz</span>
+                    </div>
+                    <div class="eq-band">
+                        <input type="range" class="eq-slider" data-eq-band="1" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-label">170Hz</span>
+                    </div>
+                    <div class="eq-band">
+                        <input type="range" class="eq-slider" data-eq-band="2" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-label">310Hz</span>
+                    </div>
+                    <div class="eq-band">
+                        <input type="range" class="eq-slider" data-eq-band="3" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-label">600Hz</span>
+                    </div>
+                    <div class="eq-band">
+                        <input type="range" class="eq-slider" data-eq-band="4" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-label">1kHz</span>
+                    </div>
+                    <div class="eq-band">
+                        <input type="range" class="eq-slider" data-eq-band="5" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-label">3kHz</span>
+                    </div>
+                    <div class="eq-band">
+                        <input type="range" class="eq-slider" data-eq-band="6" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-label">14kHz</span>
+                    </div>
+                </div>
+                <div class="eq-scale">
+                    <span class="eq-scale-label">+12dB</span>
+                    <span class="eq-scale-label">0dB</span>
+                    <span class="eq-scale-label">-12dB</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

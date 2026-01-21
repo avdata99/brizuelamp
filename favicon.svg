@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="45" fill="url(#grad)"/>
+  
+  <!-- Radio waves -->
+  <path d="M 30 50 Q 30 35, 45 35" stroke="white" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M 25 50 Q 25 28, 45 28" stroke="white" stroke-width="3" fill="none" opacity="0.4"/>
+  <path d="M 70 50 Q 70 35, 55 35" stroke="white" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M 75 50 Q 75 28, 55 28" stroke="white" stroke-width="3" fill="none" opacity="0.4"/>
+  
+  <!-- Radio icon -->
+  <rect x="38" y="45" width="24" height="18" rx="2" fill="white"/>
+  <rect x="40" y="47" width="8" height="6" rx="1" fill="#6366f1"/>
+  <rect x="52" y="47" width="8" height="6" rx="1" fill="#6366f1"/>
+  <circle cx="44" cy="58" r="2" fill="#6366f1"/>
+  <circle cx="56" cy="58" r="2" fill="#6366f1"/>
+  
+  <!-- Antenna -->
+  <line x1="50" y1="45" x2="50" y2="35" stroke="white" stroke-width="2"/>
+  <circle cx="50" cy="33" r="2" fill="white"/>
+</svg>

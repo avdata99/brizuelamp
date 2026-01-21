@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brizuelamp</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .winamp-container {
+            width: 520px;
+            background: linear-gradient(180deg, #5c5c5c 0%, #3a3a3a 100%);
+            border: 2px outset #888;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(180deg, #4a5f8f 0%, #2d3f5f 100%);
+            padding: 4px 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #000;
+        }
+
+        .title-text {
+            color: #fff;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .title-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px outset #fff;
+            font-size: 9px;
+            line-height: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        /* Main Display */
+        .main-display {
+            background: #000;
+            padding: 8px;
+            margin: 6px;
+            border: 2px inset #444;
+        }
+
+        .led-display {
+            background: #0a0a0a;
+            padding: 12px;
+            border: 1px solid #333;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            text-shadow: 0 0 8px #00ff00;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 2px;
+            min-height: 45px;
+        }
+
+        .stream-info {
+            color: #00ff00;
+            font-size: 12px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* Visualizer */
+        .visualizer-section {
+            margin: 6px;
+            padding: 8px;
+            background: #000;
+            border: 2px inset #444;
+        }
+
+        .audio-visualizer {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .visualizer-bar {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            top: 0;
+            left: 0;
+        }
+
+        .visualizer-status {
+            font-size: 11px;
+            color: #00ff00;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* Controls Section */
+        .controls-section {
+            padding: 8px;
+            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+        }
+
+        .stream-selector-row {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        select {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            border: 2px inset #666;
+            text-shadow: 0 0 6px #00ff00;
+        }
+
+        /* Buttons */
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .winamp-btn {
+            width: 50px;
+            height: 40px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            border: 2px outset #999;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            text-shadow: 1px 1px 1px #000;
+            transition: all 0.1s;
+        }
+
+        .winamp-btn:hover:not(:disabled) {
+            background: linear-gradient(180deg, #909090 0%, #707070 100%);
+        }
+
+        .winamp-btn:active:not(:disabled) {
+            border-style: inset;
+            transform: translateY(1px);
+        }
+
+        .winamp-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-play { color: #00ff00; }
+        .btn-pause { color: #ffaa00; }
+        .btn-stop { color: #ff4444; }
+
+        /* Volume Control */
+        .volume-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: #000;
+            border: 2px inset #444;
+            margin: 6px;
+        }
+
+        .volume-icon-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .volume-label {
+            color: #00ff00;
+            font-size: 13px;
+        }
+
+        #volume-slider {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #333;
+            border: 1px inset #222;
+        }
+
+        #volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 16px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            border: 1px outset #999;
+            cursor: pointer;
+        }
+
+        #volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 16px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            border: 1px outset #999;
+            cursor: pointer;
+        }
+
+        #volume-value {
+            color: #00ff00;
+            font-size: 13px;
+            min-width: 40px;
+        }
+
+        /* Delay Controls */
+        .delay-section {
+            padding: 8px;
+            background: #000;
+            border: 2px inset #444;
+            margin: 6px;
+        }
+
+        .delay-header {
+            color: #00ff00;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .delay-display {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .delay-value {
+            font-size: 28px;
+            color: #00ff00;
+            text-shadow: 0 0 8px #00ff00;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .delay-value.positive {
+            color: #00ff00;
+            text-shadow: 0 0 8px #00ff00;
+        }
+
+        /* Delay Slider */
+        .delay-slider-container {
+            margin: 12px 0;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .slider-label {
+            color: #00ff00;
+            font-size: 10px;
+        }
+
+        .slider-label-center {
+            color: #00aa00;
+            font-size: 10px;
+        }
+
+        .delay-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #ff0000 0%, #ffaa00 25%, #00ff00 75%, #00ff00 100%);
+            border: 1px inset #222;
+        }
+
+        .delay-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 20px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            border: 2px outset #999;
+            cursor: pointer;
+        }
+
+        .delay-slider::-moz-range-thumb {
+            width: 16px;
+            height: 20px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            border: 2px outset #999;
+            cursor: pointer;
+        }
+
+        /* Delay Buttons */
+        .delay-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: nowrap;
+            margin-top: 8px;
+        }
+
+        .delay-btn {
+            padding: 8px 12px;
+            background: linear-gradient(180deg, #606060 0%, #404040 100%);
+            border: 2px outset #777;
+            color: #00ff00;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            min-width: 60px;
+            flex: 1;
+        }
+
+        .delay-btn:hover:not(:disabled) {
+            background: linear-gradient(180deg, #707070 0%, #505050 100%);
+        }
+
+        .delay-btn:active:not(:disabled) {
+            border-style: inset;
+        }
+
+        .delay-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-live {
+            background: linear-gradient(180deg, #ff6060 0%, #cc4040 100%);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .btn-live:hover:not(:disabled) {
+            background: linear-gradient(180deg, #ff7070 0%, #dd5050 100%);
+        }
+
+        /* Equalizer WinAmp Style */
+        .eq-winamp-section {
+            padding: 8px;
+            background: #000;
+            border: 2px inset #444;
+            margin: 6px;
+        }
+
+        .eq-winamp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .delay-hint {
+            text-align: center;
+            font-size: 9px;
+            color: #00aa00;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .eq-winamp-title {
+            color: #00ff00;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .eq-winamp-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .eq-winamp-btn {
+            padding: 4px 8px;
+            background: linear-gradient(180deg, #606060 0%, #404040 100%);
+            border: 2px outset #777;
+            color: #00ff00;
+            font-size: 9px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+        }
+
+        .eq-winamp-btn:hover {
+            background: linear-gradient(180deg, #707070 0%, #505050 100%);
+        }
+
+        .eq-winamp-btn:active {
+            border-style: inset;
+        }
+
+        .eq-winamp-panel {
+            display: flex;
+            gap: 8px;
+        }
+
+        .eq-winamp-sliders {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            gap: 6px;
+            flex: 1;
+            min-height: 150px;
+        }
+
+        .eq-winamp-band {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .eq-winamp-slider {
+            -webkit-appearance: slider-vertical;
+            writing-mode: bt-lr;
+            width: 6px;
+            height: 140px;
+            background: linear-gradient(to top,
+                #ff0000 0%,
+                #ff6600 20%,
+                #ffaa00 40%,
+                #00ff00 50%,
+                #ffaa00 60%,
+                #ff6600 80%,
+                #ff0000 100%);
+            border: 1px inset #222;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .eq-winamp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 8px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            border: 1px outset #999;
+            cursor: pointer;
+        }
+
+        .eq-winamp-slider::-moz-range-thumb {
+            width: 16px;
+            height: 8px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            border: 1px outset #999;
+            cursor: pointer;
+        }
+
+        .eq-winamp-label {
+            font-size: 9px;
+            color: #00ff00;
+            text-align: center;
+            min-width: 24px;
+        }
+
+        .eq-winamp-scale {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0 4px;
+            height: 140px;
+        }
+
+        .eq-winamp-scale-mark {
+            font-size: 9px;
+            color: #00aa00;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .winamp-container {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .led-display {
+                font-size: 18px;
+            }
+
+            .delay-value {
+                font-size: 22px;
+            }
+
+            .winamp-btn {
+                width: 45px;
+                height: 36px;
+            }
+
+            .eq-winamp-slider {
+                height: 120px;
+            }
+
+            .eq-winamp-scale {
+                height: 120px;
+            }
+
+            .eq-winamp-sliders {
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="winamp-container">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-text">⚡ BRIZUELAMP</div>
+            <div class="title-buttons">
+                <div class="title-btn">_</div>
+                <div class="title-btn">□</div>
+                <div class="title-btn">×</div>
+            </div>
+        </div>
+
+        <!-- Main Display -->
+        <div class="main-display">
+            <div class="led-display" id="delay-value">0 ms</div>
+            <div class="stream-info">
+                <div id="visualizer-status" class="visualizer-status">SELECCIONA UN STREAM</div>
+            </div>
+        </div>
+
+        <!-- Visualizer -->
+        <div class="visualizer-section">
+            <div class="audio-visualizer" id="audio-visualizer">
+                <div class="visualizer-bar" data-bar="0"></div>
+                <div class="visualizer-bar" data-bar="1"></div>
+                <div class="visualizer-bar" data-bar="2"></div>
+                <div class="visualizer-bar" data-bar="3"></div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <!-- Stream Selector -->
+            <div class="stream-selector-row">
+                <select id="stream-selector">
+                    <option value="">-- ELEGIR RADIO --</option>
+                    <option value="http://server1.dainusradio.com:2341/stream">SUCESOS</option>
+                    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/radio3.mp3">CADENA 3</option>
+                </select>
+            </div>
+
+            <!-- Transport Buttons -->
+            <div class="button-row">
+                <button id="play-btn" class="winamp-btn btn-play" disabled title="Reproducir">▶</button>
+                <button id="pause-btn" class="winamp-btn btn-pause" disabled title="Pausar">⏸</button>
+                <button id="stop-btn" class="winamp-btn btn-stop" disabled title="Detener">⏹</button>
+            </div>
+        </div>
+
+        <!-- Volume Control -->
+        <div class="volume-section">
+            <button id="mute-btn" class="volume-icon-btn" title="Silenciar/Activar sonido">🔊</button>
+            <span class="volume-label">VOL:</span>
+            <input type="range" id="volume-slider" min="0" max="100" value="100">
+            <span id="volume-value">100%</span>
+        </div>
+
+        <!-- Delay Controls -->
+        <div class="delay-section">
+            <div class="delay-header">⏱ CONTROL DE DELAY</div>
+
+            <div class="delay-slider-container">
+                <div class="slider-labels">
+                    <span class="slider-label">← 3MIN</span>
+                    <span class="slider-label-center">1.5M</span>
+                    <span class="slider-label">LIVE →</span>
+                </div>
+                <input type="range" id="delay-slider" class="delay-slider"
+                       min="0" max="180000" step="500" value="180000" disabled>
+            </div>
+
+            <div class="delay-buttons">
+                <button class="delay-btn" data-delay="1000" title="1 segundo atrás">‹ 1s</button>
+                <button class="delay-btn" data-delay="100" title="0.1 segundos atrás">‹ 0.1s</button>
+
+                <button id="go-live-btn" class="delay-btn btn-live" title="Ir al vivo">● LIVE</button>
+
+                <button class="delay-btn" data-delay="-100" title="0.1 segundos adelante">0.1s ›</button>
+                <button class="delay-btn" data-delay="-1000" title="1 segundo adelante">1s ›</button>
+            </div>
+            <div class="delay-hint">USA EL SLIDER PARA AJUSTES GRANDES</div>
+        </div>
+
+        <!-- Equalizer Section -->
+        <div class="eq-winamp-section">
+            <div class="eq-winamp-header">
+                <span class="eq-winamp-title">⚡ EQUALIZER</span>
+                <div class="eq-winamp-controls">
+                    <button id="eq-toggle-btn" class="eq-winamp-btn">HIDE</button>
+                    <button id="eq-reset-btn" class="eq-winamp-btn">RESET</button>
+                </div>
+            </div>
+
+            <div id="eq-panel" class="eq-winamp-panel">
+                <div class="eq-winamp-sliders">
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="0" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">60</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="1" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">170</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="2" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">310</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="3" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">600</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="4" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">1K</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="5" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">3K</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="6" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">6K</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="7" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">12K</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="8" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">14K</span>
+                    </div>
+                    <div class="eq-winamp-band">
+                        <input type="range" class="eq-winamp-slider" data-eq-band="9" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                        <span class="eq-winamp-label">16K</span>
+                    </div>
+                </div>
+                <div class="eq-winamp-scale">
+                    <span class="eq-winamp-scale-mark">+12</span>
+                    <span class="eq-winamp-scale-mark">0</span>
+                    <span class="eq-winamp-scale-mark">-12</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
