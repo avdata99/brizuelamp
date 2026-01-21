@@ -186,7 +186,7 @@
         .btn-stop { color: #ff4444; }
 
         /* Volume Control */
-        .volume-section {
+        .volume-section, .cafe-section {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -194,6 +194,10 @@
             background: #000;
             border: 2px inset #444;
             margin: 6px;
+        }
+
+        .cafe-section {
+            justify-content: center;
         }
 
         .volume-icon-btn {
@@ -543,6 +547,14 @@
             </div>
         </div>
 
+        <!-- View Switcher -->
+        <div style="padding: 6px; background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%); border-bottom: 2px solid #000;">
+            <div style="display: flex; gap: 4px;">
+                <button onclick="window.location.href='index.html'" style="flex: 1; padding: 8px; background: linear-gradient(180deg, #606060 0%, #404040 100%); border: 2px outset #777; color: #00ff00; font-size: 11px; font-family: 'Courier New', monospace; cursor: pointer;">🎨 MODERN</button>
+                <button style="flex: 1; padding: 8px; background: linear-gradient(180deg, #ff6060 0%, #cc4040 100%); border: 2px inset #555; color: #fff; font-size: 11px; font-family: 'Courier New', monospace; font-weight: bold; cursor: not-allowed;">⚡ WINAMP</button>
+            </div>
+        </div>
+
         <!-- Main Display -->
         <div class="main-display">
             <div class="led-display" id="delay-value">0 ms</div>
@@ -586,6 +598,9 @@
             <span class="volume-label">VOL:</span>
             <input type="range" id="volume-slider" min="0" max="100" value="100">
             <span id="volume-value">100%</span>
+        </div>
+
+        <div class="cafe-section">
             <a href='https://cafecito.app/avdata99' rel='noopener' target='_blank'>
                 <img srcset='https://cdn.cafecito.app/imgs/buttons/button_4.png 1x, https://cdn.cafecito.app/imgs/buttons/button_4_2x.png 2x, https://cdn.cafecito.app/imgs/buttons/button_4_3.75x.png 3.75x' src='https://cdn.cafecito.app/imgs/buttons/button_4.png' alt='Invitame un café en cafecito.app' />
             </a>
@@ -675,6 +690,27 @@
                     <span class="eq-winamp-scale-mark">0</span>
                     <span class="eq-winamp-scale-mark">-12</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Custom Streams Section -->
+        <div class="eq-winamp-section">
+            <div class="eq-winamp-header">
+                <span class="eq-winamp-title">📻 CUSTOM STREAMS</span>
+            </div>
+
+            <div style="padding: 8px; display: flex; flex-direction: column; gap: 8px;">
+                <input type="text" id="custom-stream-name" placeholder="NOMBRE DEL STREAM" style="padding: 8px 10px; font-size: 11px; font-family: 'Courier New', monospace; background: #000; color: #00ff00; border: 2px inset #666; text-shadow: 0 0 6px #00ff00;">
+                <input type="text" id="custom-stream-url" placeholder="URL DEL STREAM" style="padding: 8px 10px; font-size: 11px; font-family: 'Courier New', monospace; background: #000; color: #00ff00; border: 2px inset #666; text-shadow: 0 0 6px #00ff00;">
+                <button id="add-custom-stream-btn" style="padding: 10px; background: linear-gradient(180deg, #00ff00 0%, #00cc00 100%); border: 2px outset #00ff00; color: #000; font-size: 11px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer;">ADD STREAM</button>
+            </div>
+
+            <div id="custom-streams-list" style="padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 40px;">
+                <!-- Custom streams will be dynamically added here -->
+            </div>
+
+            <div style="padding: 8px; background: rgba(0, 255, 0, 0.1); border: 1px solid rgba(0, 255, 0, 0.2); margin: 6px; text-align: center;">
+                <p style="font-size: 10px; color: #00ff00; margin: 0;">💡 WANT US TO ADD THIS? EMAIL: <a href="mailto:brizuelamp@data99.com.ar" style="color: #00ff00; font-weight: bold; text-decoration: underline;">brizuelamp@data99.com.ar</a></p>
             </div>
         </div>
     </div>

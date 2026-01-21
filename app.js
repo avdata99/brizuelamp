@@ -1181,40 +1181,80 @@ class RadioPlayer {
         // Clear existing items
         this.customStreamsList.innerHTML = '';
 
+        // Detect if we're in WinAmp style (check for winamp-specific classes in document)
+        const isWinAmpStyle = document.querySelector('.winamp-container') !== null;
+
         if (this.customStreams.length === 0) {
-            this.customStreamsList.innerHTML = '<p style="color: #71717a; font-size: 0.85rem; text-align: center; padding: 12px;">No hay streams personalizados aún.</p>';
+            if (isWinAmpStyle) {
+                this.customStreamsList.innerHTML = '<p style="color: #00ff00; font-size: 10px; text-align: center; padding: 8px;">NO CUSTOM STREAMS YET</p>';
+            } else {
+                this.customStreamsList.innerHTML = '<p style="color: #71717a; font-size: 0.85rem; text-align: center; padding: 12px;">No hay streams personalizados aún.</p>';
+            }
             return;
         }
 
         // Render each custom stream
         this.customStreams.forEach((stream, index) => {
             const item = document.createElement('div');
-            item.className = 'custom-stream-item';
 
-            const info = document.createElement('div');
-            info.className = 'custom-stream-info';
+            if (isWinAmpStyle) {
+                // WinAmp style
+                item.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; background: #000; border: 1px solid #333; margin-bottom: 4px;';
 
-            const name = document.createElement('div');
-            name.className = 'custom-stream-name';
-            name.textContent = stream.name;
+                const info = document.createElement('div');
+                info.style.cssText = 'flex: 1; min-width: 0;';
 
-            const url = document.createElement('div');
-            url.className = 'custom-stream-url';
-            url.textContent = stream.url;
-            url.title = stream.url;
+                const name = document.createElement('div');
+                name.style.cssText = 'font-size: 11px; font-weight: bold; color: #00ff00; margin-bottom: 2px; font-family: "Courier New", monospace;';
+                name.textContent = stream.name;
 
-            info.appendChild(name);
-            info.appendChild(url);
+                const url = document.createElement('div');
+                url.style.cssText = 'font-size: 9px; color: #00aa00; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: "Courier New", monospace;';
+                url.textContent = stream.url;
+                url.title = stream.url;
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn-delete-stream';
-            deleteBtn.textContent = 'Eliminar';
-            deleteBtn.addEventListener('click', () => {
-                this.deleteCustomStream(index);
-            });
+                info.appendChild(name);
+                info.appendChild(url);
 
-            item.appendChild(info);
-            item.appendChild(deleteBtn);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.style.cssText = 'padding: 4px 8px; background: linear-gradient(180deg, #ff6060 0%, #cc4040 100%); border: 2px outset #ff7070; color: #fff; font-size: 9px; font-family: "Courier New", monospace; cursor: pointer; margin-left: 8px; flex-shrink: 0;';
+                deleteBtn.textContent = 'DEL';
+                deleteBtn.addEventListener('click', () => {
+                    this.deleteCustomStream(index);
+                });
+
+                item.appendChild(info);
+                item.appendChild(deleteBtn);
+            } else {
+                // Modern style
+                item.className = 'custom-stream-item';
+
+                const info = document.createElement('div');
+                info.className = 'custom-stream-info';
+
+                const name = document.createElement('div');
+                name.className = 'custom-stream-name';
+                name.textContent = stream.name;
+
+                const url = document.createElement('div');
+                url.className = 'custom-stream-url';
+                url.textContent = stream.url;
+                url.title = stream.url;
+
+                info.appendChild(name);
+                info.appendChild(url);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-delete-stream';
+                deleteBtn.textContent = 'Eliminar';
+                deleteBtn.addEventListener('click', () => {
+                    this.deleteCustomStream(index);
+                });
+
+                item.appendChild(info);
+                item.appendChild(deleteBtn);
+            }
+
             this.customStreamsList.appendChild(item);
         });
     }

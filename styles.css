@@ -17,6 +17,54 @@ body {
     margin: 0 auto;
 }
 
+/* View Switcher */
+.view-switcher {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.view-btn {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #a1a1aa;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.view-btn:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e4e4e7;
+    transform: translateY(-1px);
+}
+
+.view-btn-active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-color: #818cf8;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    cursor: default;
+}
+
+.view-btn-active:hover {
+    transform: none;
+}
+
 h1 {
     text-align: center;
     margin-bottom: 30px;
@@ -464,13 +512,17 @@ select option {
 }
 
 /* Volume control */
-.volume-control {
+.volume-control, .cafe-control {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cafe-control {
+    justify-content: center;
 }
 
 .volume-icon-btn {
@@ -775,6 +827,11 @@ select option {
     h1 {
         font-size: 1.6rem;
         margin-bottom: 20px;
+    }
+
+    .view-btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
     }
 
     .card {
