@@ -30,9 +30,20 @@ class RadioPlayer {
 
         // Official streams (hardcoded from HTML)
         this.officialStreams = [
-            { name: 'Sucesos', url: 'https://server1.dainusradio.com:2341/stream' },
             { name: 'Cadena 3', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/radio3.mp3' },
-            // { name: 'Suquia', url: 'https://streaming01.shockmedia.com.ar:10945/;' },
+            { name: 'Sucesos', url: 'https://server1.dainusradio.com:2341/stream' },
+            { name: 'Suquia', url: 'https://streaming01.shockmedia.com.ar:10945/;' },
+            {
+                name: 'Gol & Pop',
+                url: 'https://streaming01.serverconnectinc.site:9515/golpop',
+                error: "Esta señal no permite conexiones externas. Pediles que lo cambien o que nos escriban"
+            },
+            {
+                name: 'LV2',
+                url: 'https://ice3.edge-apps.net/ros3-lv2/live/playlist.m3u8',
+                error: "Esta señal no permite conexiones externas. Pediles que lo cambien o que nos escriban"
+            },
+            
         ];
 
         // Audio state
@@ -44,6 +55,7 @@ class RadioPlayer {
         this.isPaused = false;
         this.isResuming = false; // Flag para indicar que estamos reanudando
         this.currentStreamUrl = '';
+        this.currentStreamError = null; // Error message for current stream (CORS, etc.)
         this.volume = 1.0;
         this.isMuted = false;
         this.volumeBeforeMute = 1.0;
@@ -238,6 +250,22 @@ class RadioPlayer {
         this.currentDelay = 0;
         this.updateDelayDisplay();
 
+        // Verificar si el stream seleccionado tiene un error conocido
+        this.currentStreamError = null;
+        if (url) {
+            // Buscar en streams oficiales
+            const officialStream = this.officialStreams.find(s => s.url === url);
+            if (officialStream && officialStream.error) {
+                this.currentStreamError = officialStream.error;
+            }
+
+            // Buscar en streams personalizados
+            const customStream = this.customStreams.find(s => s.url === url);
+            if (customStream && customStream.error) {
+                this.currentStreamError = customStream.error;
+            }
+        }
+
         // Cargar preset de EQ para este stream
         this.loadEQPreset(url);
 
@@ -253,8 +281,13 @@ class RadioPlayer {
         this.updateControls();
 
         if (url) {
-            // this.setStatus('Stream seleccionado. Presiona ▶ para comenzar.', 'stopped');
-            this.setVisualizerStatus('Presiona ▶ para reproducir');
+            if (this.currentStreamError) {
+                // Mostrar mensaje de error
+                this.setVisualizerStatus('⚠️ ' + this.currentStreamError);
+            } else {
+                // this.setStatus('Stream seleccionado. Presiona ▶ para comenzar.', 'stopped');
+                this.setVisualizerStatus('Presiona ▶ para reproducir');
+            }
         } else {
             // this.setStatus('Sin conexión', '');
             this.setVisualizerStatus('Selecciona un stream');
@@ -838,7 +871,8 @@ class RadioPlayer {
             // El botón play está habilitado cuando:
             // 1. No está reproduciendo y hay un stream seleccionado
             // 2. Está pausado (para reanudar)
-            this.playBtn.disabled = (this.isPlaying && !this.isPaused) || !this.currentStreamUrl;
+            // 3. El stream NO tiene error conocido (CORS, etc.)
+            this.playBtn.disabled = (this.isPlaying && !this.isPaused) || !this.currentStreamUrl || this.currentStreamError !== null;
 
             // Cambiar icono según el estado
             if (this.isPaused) {
