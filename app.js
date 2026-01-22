@@ -36,12 +36,12 @@ class RadioPlayer {
             {
                 name: 'Gol & Pop',
                 url: 'https://streaming01.serverconnectinc.site:9515/golpop',
-                error: "Esta señal no permite conexiones externas. Pediles que lo cambien o que nos escriban"
+                error: "Gol & Pop no permite conexiones externas. Pediles que lo cambien o que nos escriban"
             },
             {
                 name: 'LV2',
                 url: 'https://ice3.edge-apps.net/ros3-lv2/live/playlist.m3u8',
-                error: "Esta señal no permite conexiones externas. Pediles que lo cambien o que nos escriban"
+                error: "LV2 no permite conexiones externas. Pediles que lo cambien o que nos escriban"
             },
             
         ];
