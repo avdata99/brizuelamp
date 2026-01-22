@@ -277,13 +277,16 @@ class RadioPlayer {
             this.hideVisualizer();
         }
 
+        // Actualizar display de error/delay
+        this.updateErrorDisplay();
+
         // Actualizar todos los controles
         this.updateControls();
 
         if (url) {
             if (this.currentStreamError) {
-                // Mostrar mensaje de error
-                this.setVisualizerStatus('⚠️ ' + this.currentStreamError);
+                // No mostrar mensaje en visualizer status, se muestra en el display principal
+                this.setVisualizerStatus('');
             } else {
                 // this.setStatus('Stream seleccionado. Presiona ▶ para comenzar.', 'stopped');
                 this.setVisualizerStatus('Presiona ▶ para reproducir');
@@ -291,6 +294,41 @@ class RadioPlayer {
         } else {
             // this.setStatus('Sin conexión', '');
             this.setVisualizerStatus('Selecciona un stream');
+        }
+    }
+
+    updateErrorDisplay() {
+        if (this.currentStreamError) {
+            // Ocultar contador de delay y mostrar mensaje de error grande
+            if (this.delayValue) {
+                this.delayValue.style.display = 'none';
+            }
+
+            // Crear o actualizar elemento de error
+            let errorDisplay = document.getElementById('stream-error-display');
+            if (!errorDisplay) {
+                errorDisplay = document.createElement('div');
+                errorDisplay.id = 'stream-error-display';
+                errorDisplay.className = 'led-display'; // Reutilizar estilos del display
+                errorDisplay.style.color = '#ff4444';
+                errorDisplay.style.textShadow = '0 0 8px #ff4444';
+                errorDisplay.style.fontSize = '18px';
+                errorDisplay.style.lineHeight = '1.4';
+                errorDisplay.style.padding = '16px';
+                this.delayValue.parentNode.insertBefore(errorDisplay, this.delayValue);
+            }
+            errorDisplay.textContent = '⚠️ ERROR: ' + this.currentStreamError;
+            errorDisplay.style.display = 'block';
+        } else {
+            // Mostrar contador de delay y ocultar error
+            if (this.delayValue) {
+                this.delayValue.style.display = 'block';
+            }
+
+            const errorDisplay = document.getElementById('stream-error-display');
+            if (errorDisplay) {
+                errorDisplay.style.display = 'none';
+            }
         }
     }
     
@@ -648,8 +686,13 @@ class RadioPlayer {
 
         this.updateControls();
         this.updateDelayDisplay(); // Actualizar display del delay
+        this.updateErrorDisplay(); // Actualizar display de error
         // this.setStatus('Detenido', 'stopped');
-        this.setVisualizerStatus('Selecciona un stream');
+        if (this.currentStreamError) {
+            this.setVisualizerStatus('');
+        } else {
+            this.setVisualizerStatus('Selecciona un stream');
+        }
     }
     
     // Volume controls
@@ -874,11 +917,24 @@ class RadioPlayer {
             // 3. El stream NO tiene error conocido (CORS, etc.)
             this.playBtn.disabled = (this.isPlaying && !this.isPaused) || !this.currentStreamUrl || this.currentStreamError !== null;
 
+            // Si está deshabilitado por error, hacer más visible la deshabilitación
+            if (this.currentStreamError !== null) {
+                this.playBtn.style.opacity = '0.2';
+                this.playBtn.style.cursor = 'not-allowed';
+                this.playBtn.title = 'No disponible: stream con error';
+            } else if (this.playBtn.disabled) {
+                this.playBtn.style.opacity = '';
+                this.playBtn.style.cursor = '';
+            } else {
+                this.playBtn.style.opacity = '';
+                this.playBtn.style.cursor = '';
+            }
+
             // Cambiar icono según el estado
             if (this.isPaused) {
                 this.playBtn.textContent = '▶';
                 this.playBtn.title = 'Reanudar';
-            } else {
+            } else if (this.currentStreamError === null) {
                 this.playBtn.textContent = '▶';
                 this.playBtn.title = 'Reproducir';
             }
