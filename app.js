@@ -248,6 +248,15 @@ class RadioPlayer {
     handleStreamChange(url) {
         this.currentStreamUrl = url;
 
+        // Track stream selection
+        if (url && typeof plausible !== 'undefined') {
+            const stream = this.officialStreams.find(s => s.url === url) ||
+                          this.customStreams.find(s => s.url === url);
+            if (stream) {
+                plausible('Stream Selected', { props: { stream: stream.name } });
+            }
+        }
+
         // Limpiar errores de conexión al cambiar de stream
         const hadConnectionError = this.currentStreamError !== null &&
             !this.officialStreams.some(s => s.url === this.currentStreamUrl && s.error) &&
@@ -352,6 +361,13 @@ class RadioPlayer {
         if (!this.currentStreamUrl) {
             // this.setStatus('Por favor, selecciona un stream primero.', 'error');
             return;
+        }
+
+        // Track play action
+        if (typeof plausible !== 'undefined') {
+            const stream = this.officialStreams.find(s => s.url === this.currentStreamUrl) ||
+                          this.customStreams.find(s => s.url === this.currentStreamUrl);
+            plausible('Play', { props: { stream: stream?.name || 'Unknown' } });
         }
 
         // Limpiar errores de conexión previos (intentar de nuevo)
@@ -500,6 +516,11 @@ class RadioPlayer {
     pause() {
         if (!this.isPlaying || this.isPaused) return;
 
+        // Track pause action
+        if (typeof plausible !== 'undefined') {
+            plausible('Pause');
+        }
+
         // Silenciar el audio (NO suspender AudioContext para mantener precisión)
         if (this.gainNode && this.useWebAudio && this.audioContext) {
             this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
@@ -517,6 +538,11 @@ class RadioPlayer {
 
     resume() {
         if (!this.isPaused) return;
+
+        // Track resume action
+        if (typeof plausible !== 'undefined') {
+            plausible('Resume');
+        }
 
         // Restaurar el volumen inmediatamente
         if (this.gainNode && this.useWebAudio && this.audioContext) {
@@ -697,6 +723,11 @@ class RadioPlayer {
     }
     
     stop() {
+        // Track stop action
+        if (typeof plausible !== 'undefined') {
+            plausible('Stop');
+        }
+
         // Marcar que estamos deteniendo intencionalmente
         this.isStopping = true;
 
@@ -792,6 +823,11 @@ class RadioPlayer {
     }
     
     toggleMute() {
+        // Track mute/unmute action
+        if (typeof plausible !== 'undefined') {
+            plausible('Mute Toggle', { props: { action: this.isMuted ? 'unmute' : 'mute' } });
+        }
+
         if (this.isMuted) {
             // Unmute
             this.isMuted = false;
@@ -847,6 +883,12 @@ class RadioPlayer {
     // Delay controls
     adjustDelay(changeMs) {
         if (!this.useWebAudio) return;
+
+        // Track delay adjustment
+        if (typeof plausible !== 'undefined') {
+            const direction = changeMs > 0 ? 'backward' : 'forward';
+            plausible('Delay Adjust', { props: { direction, amount: Math.abs(changeMs) + 'ms' } });
+        }
 
         const newDelay = this.currentDelay + changeMs;
 
@@ -904,6 +946,11 @@ class RadioPlayer {
 
     goToLive() {
         if (!this.useWebAudio) return;
+
+        // Track go live action
+        if (typeof plausible !== 'undefined') {
+            plausible('Go Live');
+        }
 
         this.currentDelay = 0;
         this.applyDelay();
@@ -1163,6 +1210,11 @@ class RadioPlayer {
     }
 
     resetEqualizer() {
+        // Track EQ reset
+        if (typeof plausible !== 'undefined') {
+            plausible('EQ Reset');
+        }
+
         this.eqSliders.forEach((slider, i) => {
             slider.value = 0;
             if (this.eqFilters[i]) {
@@ -1180,6 +1232,12 @@ class RadioPlayer {
 
         if (eqPanel && eqToggleBtn) {
             const isHidden = eqPanel.style.display === 'none';
+
+            // Track EQ toggle
+            if (typeof plausible !== 'undefined') {
+                plausible('EQ Toggle', { props: { action: isHidden ? 'show' : 'hide' } });
+            }
+
             eqPanel.style.display = isHidden ? 'block' : 'none';
 
             // Detectar si es versión WinAmp o normal por el contenido del botón
@@ -1274,6 +1332,17 @@ class RadioPlayer {
         this.saveCustomStreams();
         this.updateStreamSelector();
         this.renderCustomStreamsList();
+
+        // Track custom stream addition
+        if (typeof plausible !== 'undefined') {
+            plausible(
+                'Custom Stream Added',
+                { props: {
+                    stream_name: name,
+                    stream_url: url
+                } }
+            );
+        }
 
         // Clear input fields
         this.customStreamName.value = '';
