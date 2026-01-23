@@ -823,11 +823,6 @@ class RadioPlayer {
     }
     
     toggleMute() {
-        // Track mute/unmute action
-        if (typeof plausible !== 'undefined') {
-            plausible('Mute Toggle', { props: { action: this.isMuted ? 'unmute' : 'mute' } });
-        }
-
         if (this.isMuted) {
             // Unmute
             this.isMuted = false;
@@ -1210,11 +1205,6 @@ class RadioPlayer {
     }
 
     resetEqualizer() {
-        // Track EQ reset
-        if (typeof plausible !== 'undefined') {
-            plausible('EQ Reset');
-        }
-
         this.eqSliders.forEach((slider, i) => {
             slider.value = 0;
             if (this.eqFilters[i]) {
@@ -1232,11 +1222,6 @@ class RadioPlayer {
 
         if (eqPanel && eqToggleBtn) {
             const isHidden = eqPanel.style.display === 'none';
-
-            // Track EQ toggle
-            if (typeof plausible !== 'undefined') {
-                plausible('EQ Toggle', { props: { action: isHidden ? 'show' : 'hide' } });
-            }
 
             eqPanel.style.display = isHidden ? 'block' : 'none';
 
