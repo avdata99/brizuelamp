@@ -34,6 +34,11 @@ class RadioPlayer {
             { name: 'Sucesos', url: 'https://server1.dainusradio.com:2341/stream' },
             { name: 'Suquia', url: 'https://streaming01.shockmedia.com.ar:10945/;' },
             {
+                name: 'Continental Córdoba',
+                // url: 'https://edge01.radiohdvivo.com/continental',
+                url: 'https://streaming.gostreaming.com.ar/8100/;'
+            },
+            {
                 name: 'Gol & Pop',
                 url: 'https://streaming01.serverconnectinc.site:9515/golpop',
                 error: "Gol & Pop no permite conexiones externas. Pediles que lo cambien o que nos escriban"
@@ -54,6 +59,7 @@ class RadioPlayer {
         this.isPlaying = false;
         this.isPaused = false;
         this.isResuming = false; // Flag para indicar que estamos reanudando
+        this.isStopping = false; // Flag para indicar que estamos deteniendo intencionalmente
         this.currentStreamUrl = '';
         this.currentStreamError = null; // Error message for current stream (CORS, etc.)
         this.volume = 1.0;
@@ -242,6 +248,15 @@ class RadioPlayer {
     handleStreamChange(url) {
         this.currentStreamUrl = url;
 
+        // Limpiar errores de conexión al cambiar de stream
+        const hadConnectionError = this.currentStreamError !== null &&
+            !this.officialStreams.some(s => s.url === this.currentStreamUrl && s.error) &&
+            !this.customStreams.some(s => s.url === this.currentStreamUrl && s.error);
+
+        if (hadConnectionError) {
+            this.currentStreamError = null;
+        }
+
         if (this.isPlaying) {
             this.stop();
         }
@@ -250,7 +265,8 @@ class RadioPlayer {
         this.currentDelay = 0;
         this.updateDelayDisplay();
 
-        // Verificar si el stream seleccionado tiene un error conocido
+        // Verificar si el stream seleccionado tiene un error conocido (predefinido)
+        // Limpiar errores de conexión previos
         this.currentStreamError = null;
         if (url) {
             // Buscar en streams oficiales
@@ -338,6 +354,17 @@ class RadioPlayer {
             return;
         }
 
+        // Limpiar errores de conexión previos (intentar de nuevo)
+        // pero mantener errores predefinidos
+        const hadPredefinedError = this.currentStreamError !== null &&
+            (this.officialStreams.some(s => s.url === this.currentStreamUrl && s.error) ||
+             this.customStreams.some(s => s.url === this.currentStreamUrl && s.error));
+
+        if (!hadPredefinedError) {
+            this.currentStreamError = null;
+            this.updateErrorDisplay();
+        }
+
         // Desactivar controles inmediatamente
         this.isPlaying = true;
         this.updateControls();
@@ -418,10 +445,18 @@ class RadioPlayer {
                 }
             };
             
-            this.audio.onerror = () => {
+            this.audio.onerror = (e) => {
+                // No mostrar error si estamos deteniendo intencionalmente
+                if (this.isStopping) return;
+
                 // No detener si estamos pausados
                 if (this.isPaused) return;
-                // this.setStatus('Error al cargar el stream. Verifica la URL o tu conexión.', 'error');
+
+                // Mostrar error de conexión
+                this.currentStreamError = 'No se pudo conectar al stream. Verifica la URL o tu conexión.';
+                this.updateErrorDisplay();
+                this.setVisualizerStatus('');
+
                 this.stop();
             };
 
@@ -430,6 +465,8 @@ class RadioPlayer {
             };
 
             this.audio.onended = () => {
+                // No procesar si estamos deteniendo intencionalmente
+                if (this.isStopping) return;
                 // No detener si estamos pausados
                 if (this.isPaused) return;
                 this.stop();
@@ -449,8 +486,13 @@ class RadioPlayer {
             
         } catch (error) {
             this.isPlaying = false;
+
+            // Mostrar error de reproducción
+            this.currentStreamError = 'Error al reproducir: ' + error.message;
+            this.updateErrorDisplay();
+            this.setVisualizerStatus('');
+
             this.updateControls();
-            // this.setStatus('Error al reproducir: ' + error.message, 'error');
             this.stop();
         }
     }
@@ -616,10 +658,18 @@ class RadioPlayer {
                 // this.setStatus(errorMsg, 'playing');
             };
 
-            this.audio.onerror = () => {
+            this.audio.onerror = (e) => {
+                // No mostrar error si estamos deteniendo intencionalmente
+                if (this.isStopping) return;
+
                 // No detener si estamos pausados
                 if (this.isPaused) return;
-                // this.setStatus('Error al cargar el stream.', 'error');
+
+                // Mostrar error de conexión
+                this.currentStreamError = 'No se pudo conectar al stream. Verifica la URL o tu conexión.';
+                this.updateErrorDisplay();
+                this.setVisualizerStatus('');
+
                 this.stop();
             };
 
@@ -628,6 +678,8 @@ class RadioPlayer {
             };
 
             this.audio.onended = () => {
+                // No procesar si estamos deteniendo intencionalmente
+                if (this.isStopping) return;
                 // No detener si estamos pausados
                 if (this.isPaused) return;
                 this.stop();
@@ -645,6 +697,9 @@ class RadioPlayer {
     }
     
     stop() {
+        // Marcar que estamos deteniendo intencionalmente
+        this.isStopping = true;
+
         if (this.audio) {
             this.audio.pause();
             this.audio.src = '';
@@ -693,6 +748,11 @@ class RadioPlayer {
         } else {
             this.setVisualizerStatus('Selecciona un stream');
         }
+
+        // Resetear flag después de un breve delay para evitar race conditions
+        setTimeout(() => {
+            this.isStopping = false;
+        }, 100);
     }
     
     // Volume controls
